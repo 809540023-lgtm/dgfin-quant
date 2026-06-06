@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>會員登入 · 屬於大家的數位金融新世代</title>
+<style>
+  :root{--bg:#05060f;--cyan:#22e3ff;--violet:#a259ff;--pink:#ff4fd8;--green:#3dffab;
+        --txt:#e9f0ff;--muted:#8893b8;--line:rgba(120,150,255,.18);--panel:rgba(255,255,255,.04)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:30px;
+    background:radial-gradient(900px 600px at 80% -10%,rgba(162,89,255,.25),transparent 60%),
+               radial-gradient(700px 500px at 10% 30%,rgba(34,227,255,.16),transparent 55%),var(--bg);
+    color:var(--txt);font-family:-apple-system,"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif}
+  a{color:var(--cyan);text-decoration:none}
+  .grad{background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .box{width:100%;max-width:440px;border:1px solid var(--line);border-radius:24px;padding:34px;
+    background:rgba(10,14,36,.7);backdrop-filter:blur(16px);box-shadow:0 24px 80px rgba(0,0,0,.5)}
+  .back{font-size:13px;color:var(--muted);display:inline-block;margin-bottom:18px}
+  h1{font-size:26px;font-weight:900;letter-spacing:-.5px}
+  .sub{color:var(--muted);font-size:14px;margin-top:6px;margin-bottom:24px}
+  .tabs{display:flex;background:var(--panel);border-radius:12px;padding:4px;margin-bottom:22px}
+  .tabs button{flex:1;padding:10px;border:none;background:transparent;color:var(--muted);
+    font-weight:700;border-radius:9px;cursor:pointer;font-size:14px;transition:.2s}
+  .tabs button.active{background:linear-gradient(90deg,var(--cyan),var(--violet));color:#04060f}
+  label{font-size:13px;color:var(--muted);display:block;margin:14px 0 6px}
+  input,select{width:100%;padding:13px 14px;border-radius:11px;border:1px solid var(--line);
+    background:rgba(255,255,255,.03);color:var(--txt);font-size:15px;outline:none;transition:.2s}
+  input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(34,227,255,.15)}
+  .btn{width:100%;margin-top:22px;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:800;
+    cursor:pointer;color:#04060f;background:linear-gradient(90deg,var(--cyan),var(--violet))}
+  .btn:hover{box-shadow:0 0 26px rgba(162,89,255,.55)}
+  .msg{margin-top:14px;font-size:13px;text-align:center;min-height:18px}
+  .msg.err{color:var(--pink)} .msg.ok{color:var(--green)}
+  .hint{margin-top:20px;font-size:12px;color:var(--muted);border:1px dashed var(--line);border-radius:10px;padding:11px 13px}
+  .hint code{color:var(--cyan)}
+  /* dashboard */
+  .dash{display:none}
+  .role-badge{display:inline-block;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:800;margin-bottom:8px}
+  .r70{background:rgba(34,227,255,.15);color:var(--cyan);border:1px solid rgba(34,227,255,.4)}
+  .r20{background:rgba(162,89,255,.15);color:var(--violet);border:1px solid rgba(162,89,255,.4)}
+  .r10{background:rgba(255,79,216,.15);color:var(--pink);border:1px solid rgba(255,79,216,.4)}
+  .stat{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .stat b{color:var(--green)}
+  .logout{margin-top:18px;background:transparent;border:1px solid var(--line);color:var(--txt)}
+</style>
+</head>
+<body>
+<div class="box">
+  <!-- AUTH VIEW -->
+  <div id="auth">
+    <a class="back" href="index.html">← 回首頁</a>
+    <h1><span class="grad">會員入口</span></h1>
+    <p class="sub">加入社群,成為新金融世代的共同擁有者。</p>
+    <div class="tabs">
+      <button id="tabLogin" class="active" onclick="switchTab('login')">登入</button>
+      <button id="tabReg" onclick="switchTab('reg')">註冊</button>
+    </div>
+
+    <!-- LOGIN -->
+    <form id="formLogin" onsubmit="return doLogin(event)">
+      <label>Email</label>
+      <input type="email" id="li_email" placeholder="you@example.com" required>
+      <label>密碼</label>
+      <input type="password" id="li_pw" placeholder="••••••••" required>
+      <button class="btn" type="submit">登入社群</button>
+    </form>
+
+    <!-- REGISTER -->
+    <form id="formReg" style="display:none" onsubmit="return doReg(event)">
+      <label>暱稱</label>
+      <input type="text" id="rg_name" placeholder="你的暱稱" required>
+      <label>Email</label>
+      <input type="email" id="rg_email" placeholder="you@example.com" required>
+      <label>密碼</label>
+      <input type="password" id="rg_pw" placeholder="至少 6 碼" minlength="6" required>
+      <label>身分(角色)</label>
+      <select id="rg_role">
+        <option value="community">社群擁有者(分潤 70%)</option>
+        <option value="operator">經營者(分潤 20%)</option>
+        <option value="advisor">顧問(分潤 10%)</option>
+      </select>
+      <button class="btn" type="submit">建立帳號</button>
+    </form>
+
+    <div class="msg" id="msg"></div>
+    <div class="hint">💡 Demo 帳號:<code>member@demo.com</code> / 密碼 <code>123456</code> · 資料存於本機瀏覽器,純前端展示。</div>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="dash" class="dash">
+    <a class="back" href="index.html">← 回首頁</a>
+    <h1>歡迎,<span class="grad" id="d_name">會員</span></h1>
+    <p class="sub" id="d_email"></p>
+    <div id="d_badge"></div>
+    <div style="margin-top:16px">
+      <div class="stat"><span>我的角色</span><b id="d_role"></b></div>
+      <div class="stat"><span>分潤權重</span><b id="d_share"></b></div>
+      <div class="stat"><span>持有代幣(demo)</span><b id="d_token">1,250 SToken</b></div>
+      <div class="stat"><span>累積分潤(demo)</span><b id="d_earn">NT$ 18,400</b></div>
+      <div class="stat"><span>綁定機器人(demo)</span><b>3 / 一百萬軍團</b></div>
+    </div>
+    <button class="btn logout" onclick="logout()">登出</button>
+  </div>
+</div>
+
+<script>
+  const KEY='dgfin_users', SES='dgfin_session';
+  const roleMap={community:{t:'社群擁有者',s:'70%',c:'r70'},operator:{t:'經營者',s:'20%',c:'r20'},advisor:{t:'顧問',s:'10%',c:'r10'}};
+
+  function getUsers(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}}
+  function saveUsers(u){localStorage.setItem(KEY,JSON.stringify(u))}
+  function seed(){const u=getUsers();if(!u['member@demo.com']){u['member@demo.com']={name:'Demo 社群成員',pw:'123456',role:'community'};saveUsers(u)}}
+  seed();
+
+  function switchTab(t){
+    const isLogin=t==='login';
+    tabLogin.classList.toggle('active',isLogin);tabReg.classList.toggle('active',!isLogin);
+    formLogin.style.display=isLogin?'block':'none';formReg.style.display=isLogin?'none':'block';
+    setMsg('','');
+  }
+  function setMsg(t,cls){const m=document.getElementById('msg');m.textContent=t;m.className='msg '+(cls||'')}
+
+  function doReg(e){e.preventDefault();
+    const u=getUsers();const email=rg_email.value.trim().toLowerCase();
+    if(u[email]){setMsg('此 Email 已註冊,請直接登入。','err');return false}
+    u[email]={name:rg_name.value.trim(),pw:rg_pw.value,role:rg_role.value};saveUsers(u);
+    setMsg('註冊成功!正在登入…','ok');
+    setTimeout(()=>login(email,rg_pw.value),700);return false;
+  }
+  function doLogin(e){e.preventDefault();login(li_email.value.trim().toLowerCase(),li_pw.value);return false}
+  function login(email,pw){
+    const u=getUsers();
+    if(!u[email]){setMsg('查無此帳號,請先註冊。','err');return}
+    if(u[email].pw!==pw){setMsg('密碼錯誤。','err');return}
+    localStorage.setItem(SES,email);render();
+  }
+  function logout(){localStorage.removeItem(SES);location.reload()}
+
+  function render(){
+    const email=localStorage.getItem(SES);const u=getUsers();
+    if(email&&u[email]){
+      const me=u[email],r=roleMap[me.role]||roleMap.community;
+      document.getElementById('auth').style.display='none';
+      const d=document.getElementById('dash');d.style.display='block';
+      d_name.textContent=me.name;d_email.textContent=email;
+      d_role.textContent=r.t;d_share.textContent=r.s;
+      d_badge.innerHTML='<span class="role-badge '+r.c+'">'+r.t+' · 分潤 '+r.s+'</span>';
+    }
+  }
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>屬於大家的數位金融新世代 · STO + RWA + AI 機器人軍團</title>
+<style>
+  :root{
+    --bg:#05060f; --bg2:#0a0e24; --panel:rgba(255,255,255,.04);
+    --cyan:#22e3ff; --violet:#a259ff; --pink:#ff4fd8; --green:#3dffab;
+    --txt:#e9f0ff; --muted:#8893b8; --line:rgba(120,150,255,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:radial-gradient(1200px 700px at 75% -10%,rgba(162,89,255,.22),transparent 60%),
+               radial-gradient(900px 600px at 10% 20%,rgba(34,227,255,.14),transparent 55%),
+               var(--bg);
+    color:var(--txt);font-family:-apple-system,"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
+    line-height:1.7;overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+  .grad{background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .glow{text-shadow:0 0 24px rgba(162,89,255,.55)}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+      background:rgba(5,6,15,.7);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .logo{font-weight:800;letter-spacing:.5px;font-size:18px}
+  .logo b{color:var(--cyan)}
+  .navlinks{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+  .navlinks a:hover{color:var(--cyan)}
+  .navbtn{display:flex;gap:10px}
+  .btn{padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;border:1px solid var(--line);transition:.2s;cursor:pointer;background:transparent;color:var(--txt)}
+  .btn:hover{border-color:var(--cyan);box-shadow:0 0 18px rgba(34,227,255,.35)}
+  .btn.solid{background:linear-gradient(90deg,var(--cyan),var(--violet));border:none;color:#04060f}
+  .btn.solid:hover{box-shadow:0 0 26px rgba(162,89,255,.6)}
+  @media(max-width:760px){.navlinks{display:none}}
+
+  /* HERO */
+  header{position:relative;padding:90px 0 40px;text-align:center}
+  .pill{display:inline-block;padding:7px 16px;border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--cyan);margin-bottom:26px}
+  h1{font-size:clamp(34px,6vw,68px);line-height:1.12;font-weight:900;letter-spacing:-1px}
+  .sub{margin:22px auto 0;max-width:720px;color:var(--muted);font-size:clamp(15px,2vw,19px)}
+  .heroline{margin:30px auto 0;max-width:760px;font-size:15px;color:var(--txt);
+    border:1px solid var(--line);border-radius:16px;padding:18px 22px;background:var(--panel)}
+  .heroline b{color:var(--green)}
+  .cta-row{margin-top:36px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .stat-row{margin-top:54px;display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
+  .stat{min-width:140px}
+  .stat .n{font-size:30px;font-weight:900}
+  .stat .l{font-size:13px;color:var(--muted)}
+
+  /* MARQUEE */
+  .marquee{margin-top:54px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    overflow:hidden;white-space:nowrap;padding:14px 0;background:rgba(255,255,255,.02)}
+  .marquee div{display:inline-block;animation:scroll 26s linear infinite;font-weight:700;color:var(--muted)}
+  .marquee span{margin:0 28px}
+  .marquee span b{color:var(--pink)}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* SECTION */
+  section{padding:88px 0}
+  .tag{font-size:13px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;font-weight:700}
+  h2{font-size:clamp(26px,4vw,42px);font-weight:900;margin:10px 0 14px;letter-spacing:-.5px}
+  .lead{color:var(--muted);max-width:680px;font-size:16px}
+
+  /* 70/20/10 */
+  .split{display:grid;grid-template-columns:340px 1fr;gap:46px;align-items:center;margin-top:46px}
+  @media(max-width:860px){.split{grid-template-columns:1fr}}
+  .donut-wrap{display:flex;justify-content:center}
+  .cards3{display:grid;gap:16px}
+  .card{border:1px solid var(--line);border-radius:18px;padding:22px;background:var(--panel);transition:.25s}
+  .card:hover{transform:translateY(-4px);border-color:var(--violet);box-shadow:0 12px 40px rgba(162,89,255,.25)}
+  .card .pct{font-size:34px;font-weight:900}
+  .card .who{font-weight:800;margin-top:2px}
+  .card .desc{color:var(--muted);font-size:14px;margin-top:6px}
+  .c70 .pct{color:var(--cyan)} .c20 .pct{color:var(--violet)} .c10 .pct{color:var(--pink)}
+  .contract-note{margin-top:26px;font-size:14px;color:var(--green);border:1px dashed rgba(61,255,171,.4);border-radius:12px;padding:12px 16px;display:inline-block}
+
+  /* STO/RWA grid */
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:42px}
+  @media(max-width:900px){.grid4{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.grid4{grid-template-columns:1fr}}
+  .feat{border:1px solid var(--line);border-radius:18px;padding:24px;background:var(--panel);transition:.25s}
+  .feat:hover{transform:translateY(-5px);border-color:var(--cyan);box-shadow:0 12px 40px rgba(34,227,255,.22)}
+  .feat .ico{font-size:30px;margin-bottom:12px}
+  .feat h3{font-size:18px;margin-bottom:8px}
+  .feat p{color:var(--muted);font-size:14px}
+
+  /* ROBOTS */
+  .robots-sec{background:linear-gradient(180deg,transparent,rgba(162,89,255,.06),transparent)}
+  .bignum{font-size:clamp(52px,12vw,140px);font-weight:900;text-align:center;letter-spacing:-3px}
+  .bignum small{font-size:.3em;color:var(--muted);font-weight:700;letter-spacing:2px}
+  .robot-claim{text-align:center;color:var(--txt);max-width:760px;margin:6px auto 0;font-size:17px}
+  .robot-claim b{color:var(--green)}
+  .grid-bots{margin:46px auto 0;display:grid;grid-template-columns:repeat(24,1fr);gap:7px;max-width:760px}
+  @media(max-width:760px){.grid-bots{grid-template-columns:repeat(16,1fr)}}
+  .bot{width:100%;aspect-ratio:1;border-radius:5px;background:rgba(34,227,255,.12);
+    border:1px solid rgba(34,227,255,.25);animation:blink 3s infinite}
+  @keyframes blink{0%,100%{opacity:.2;box-shadow:none}50%{opacity:1;box-shadow:0 0 10px var(--cyan)}}
+
+  /* LAYERS */
+  .layers{margin-top:46px;display:grid;gap:14px}
+  .layer{display:grid;grid-template-columns:64px 1fr;gap:20px;align-items:center;
+    border:1px solid var(--line);border-radius:18px;padding:22px;background:var(--panel);position:relative;overflow:hidden}
+  .layer .lvl{font-size:30px;font-weight:900;color:var(--violet);opacity:.6}
+  .layer h3{font-size:19px} .layer p{color:var(--muted);font-size:14px;margin-top:4px}
+  .layer::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+    background:linear-gradient(180deg,var(--cyan),var(--violet))}
+
+  /* ROADMAP */
+  .road{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:42px}
+  @media(max-width:900px){.road{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.road{grid-template-columns:1fr}}
+  .phase{border:1px solid var(--line);border-radius:18px;padding:22px;background:var(--panel)}
+  .phase .ph{color:var(--cyan);font-weight:800;font-size:14px;letter-spacing:1px}
+  .phase h3{font-size:17px;margin:8px 0}
+  .phase ul{list-style:none;color:var(--muted);font-size:13.5px}
+  .phase li{padding:4px 0 4px 18px;position:relative}
+  .phase li::before{content:"▸";position:absolute;left:0;color:var(--violet)}
+
+  /* CTA */
+  .cta-box{margin-top:30px;text-align:center;border:1px solid var(--line);border-radius:24px;
+    padding:54px 26px;background:radial-gradient(600px 300px at 50% 0%,rgba(162,89,255,.18),transparent)}
+  .cta-box h2{margin-bottom:10px}
+
+  /* DISCLAIMER */
+  .disc{margin-top:60px;font-size:12.5px;color:var(--muted);border:1px solid var(--line);
+    border-radius:14px;padding:20px 22px;background:rgba(255,255,255,.02)}
+  .disc b{color:var(--pink)}
+  footer{padding:40px 0 70px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">機器人<b>·</b>新金融</div>
+    <div class="navlinks">
+      <a href="#share">分潤機制</a>
+      <a href="#sto">STO/RWA</a>
+      <a href="#robots">機器人軍團</a>
+      <a href="#arch">四層架構</a>
+      <a href="#road">路線圖</a>
+      <a href="board.html">選股看板</a>
+    </div>
+    <div class="navbtn">
+      <a class="btn" href="login.html">會員登入</a>
+      <a class="btn solid" href="admin.html">後台管理</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header>
+  <div class="wrap">
+    <span class="pill">AI · 社群 · 區塊鏈 · RWA-STO 下一個世代</span>
+    <h1>屬於大家的<br><span class="grad glow">數位金融新世代</span></h1>
+    <p class="sub">我們集合社群的重點力量,把利益寫進規則:社群擁有者拿 <b>70%</b>、經營者 <b>20%</b>、顧問 <b>10%</b>。我只負責架構,負責打造 <b>一百萬個機器人</b>。</p>
+    <div class="heroline">
+      我們即將成為這個新金融時代的 <b>台積電 × 黃仁勳團隊</b> —— 而這一切的利益,屬於大家。
+    </div>
+    <div class="cta-row">
+      <a class="btn solid" href="login.html">加入社群 · 立即登入</a>
+      <a class="btn" href="#share">了解 70/20/10</a>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="n grad">1,000,000</div><div class="l">即將上線的機器人</div></div>
+      <div class="stat"><div class="n grad">70%</div><div class="l">獲利歸社群</div></div>
+      <div class="stat"><div class="n grad">RWA+STO</div><div class="l">資產代幣化基礎</div></div>
+    </div>
+  </div>
+  <div class="marquee">
+    <div>
+      <span>台股 STO 社群</span><span>·</span><span>資產上鏈 <b>RWA</b></span><span>·</span><span>分潤寫進智能合約</span><span>·</span><span>一百萬機器人軍團</span><span>·</span><span>DAO 自主治理</span><span>·</span><span>利益屬於大家</span><span>·</span>
+      <span>台股 STO 社群</span><span>·</span><span>資產上鏈 <b>RWA</b></span><span>·</span><span>分潤寫進智能合約</span><span>·</span><span>一百萬機器人軍團</span><span>·</span><span>DAO 自主治理</span><span>·</span><span>利益屬於大家</span><span>·</span>
+    </div>
+  </div>
+</header>
+
+<!-- 70/20/10 -->
+<section id="share">
+  <div class="wrap">
+    <div class="tag">Profit Sharing</div>
+    <h2>70 / 20 / 10 —— 利益分配,<span class="grad">寫進智能合約</span></h2>
+    <p class="lead">不是口號,而是規則。分潤比例由智能合約自動執行、不可竄改、鏈上公開可查,讓每一個社群成員都看得到、拿得到。</p>
+    <div class="split">
+      <div class="donut-wrap">
+        <svg width="300" height="300" viewBox="0 0 42 42" id="donut">
+          <circle cx="21" cy="21" r="15.915" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="6"></circle>
+          <circle class="seg" cx="21" cy="21" r="15.915" fill="none" stroke="#22e3ff" stroke-width="6"
+                  stroke-dasharray="0 100" stroke-dashoffset="25" data-final="70 30"></circle>
+          <circle class="seg" cx="21" cy="21" r="15.915" fill="none" stroke="#a259ff" stroke-width="6"
+                  stroke-dasharray="0 100" stroke-dashoffset="-45" data-final="20 80"></circle>
+          <circle class="seg" cx="21" cy="21" r="15.915" fill="none" stroke="#ff4fd8" stroke-width="6"
+                  stroke-dasharray="0 100" stroke-dashoffset="-65" data-final="10 90"></circle>
+          <text x="21" y="20" text-anchor="middle" fill="#e9f0ff" font-size="5" font-weight="bold">100%</text>
+          <text x="21" y="26" text-anchor="middle" fill="#8893b8" font-size="2.6">鏈上分潤</text>
+        </svg>
+      </div>
+      <div class="cards3">
+        <div class="card c70"><div class="pct">70%</div><div class="who">社群擁有者</div><div class="desc">真正出力、貢獻、持有的人。社群是主角,獲利的大頭歸大家。</div></div>
+        <div class="card c20"><div class="pct">20%</div><div class="who">經營者</div><div class="desc">負責架構、營運與系統維護 —— 打造一百萬機器人的人。</div></div>
+        <div class="card c10"><div class="pct">10%</div><div class="who">顧問</div><div class="desc">提供策略、合規與資源對接的專業顧問群。</div></div>
+      </div>
+    </div>
+    <div class="contract-note">✔ 比例硬編碼於智能合約 · 鏈上自動分配 · 公開透明 · 不可後門竄改</div>
+  </div>
+</section>
+
+<!-- STO / RWA -->
+<section id="sto">
+  <div class="wrap">
+    <div class="tag">Why STO + RWA</div>
+    <h2>為什麼是 <span class="grad">STO + RWA</span>?</h2>
+    <p class="lead">把現實世界資產搬上鏈,用證券型代幣承載價值與權益 —— 這是讓社群共享利益、又站在合規軌道上的關鍵基礎。</p>
+    <div class="grid4">
+      <div class="feat"><div class="ico">🏦</div><h3>真實資產背書</h3><p>RWA 把房產、債權、營收權等現實資產上鏈,代幣不是空氣,背後有真東西。</p></div>
+      <div class="feat"><div class="ico">📜</div><h3>合規證券化</h3><p>STO 以證券型代幣發行,走監理框架,讓「社群共享」站得住法律基礎。</p></div>
+      <div class="feat"><div class="ico">🔓</div><h3>流動性與分割</h3><p>高門檻資產被切成可流通的小單位,讓更多人能參與、能進能出。</p></div>
+      <div class="feat"><div class="ico">⛓️</div><h3>透明可驗證</h3><p>持份、分潤、交易全部上鏈,任何人都能查證,信任由程式碼保證。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROBOTS -->
+<section id="robots" class="robots-sec">
+  <div class="wrap">
+    <div class="tag" style="text-align:center;display:block">The Robot Legion</div>
+    <div class="bignum" id="bignum">0 <small>個機器人</small></div>
+    <p class="robot-claim">我只負責架構 —— 負責打造 <b>一百萬個機器人</b>。它們執行交易、做市、風控、客服與資料分析,<b>連未來的管理與治理,也交給代理機器人</b>。人定方向,機器人跑流程。</p>
+    <div class="grid-bots" id="botgrid"></div>
+  </div>
+</section>
+
+<!-- LAYERS -->
+<section id="arch">
+  <div class="wrap">
+    <div class="tag">Architecture</div>
+    <h2>四層架構 —— <span class="grad">從資產到自主治理</span></h2>
+    <p class="lead">底層是真實資產,往上是鏈、是 AI 軍團,最頂是社群自主治理。每一層都為「利益屬於大家」服務。</p>
+    <div class="layers">
+      <div class="layer"><div class="lvl">01</div><div><h3>RWA 真實資產層</h3><p>房產、營收權、債權等現實資產,做為整個系統的價值地基。</p></div></div>
+      <div class="layer"><div class="lvl">02</div><div><h3>區塊鏈層</h3><p>資產代幣化、智能合約自動分潤(70/20/10)、鏈上公開帳本。</p></div></div>
+      <div class="layer"><div class="lvl">03</div><div><h3>AI 機器人軍團層</h3><p>一百萬個機器人負責交易、做市、風控、客服、資料分析與營運。</p></div></div>
+      <div class="layer"><div class="lvl">04</div><div><h3>DAO 自主治理層</h3><p>社群以代幣投票決策,治理流程也交給代理機器人執行 —— 自主、持續、不打烊。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section id="road">
+  <div class="wrap">
+    <div class="tag">Roadmap</div>
+    <h2>路線圖 —— <span class="grad">四個 Phase</span></h2>
+    <div class="road">
+      <div class="phase"><div class="ph">PHASE 1</div><h3>社群與基礎</h3><ul><li>集結台股 STO 社群</li><li>確立 70/20/10 規則</li><li>前後台與帳號系統上線</li></ul></div>
+      <div class="phase"><div class="ph">PHASE 2</div><h3>資產上鏈</h3><ul><li>首批 RWA 標的評估</li><li>STO 合規架構</li><li>智能合約分潤部署</li></ul></div>
+      <div class="phase"><div class="ph">PHASE 3</div><h3>機器人軍團</h3><ul><li>交易/做市/風控機器人</li><li>規模化至百萬代理</li><li>營運自動化</li></ul></div>
+      <div class="phase"><div class="ph">PHASE 4</div><h3>自主治理</h3><ul><li>DAO 投票治理</li><li>治理層代理化</li><li>生態自我運轉</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="wrap">
+    <div class="cta-box">
+      <div class="tag">Join Now</div>
+      <h2>下一個世代,<span class="grad glow">屬於數位貨幣</span></h2>
+      <p class="lead" style="margin:0 auto 26px">我們已經準備好了。加入社群,成為新金融時代的共同擁有者。</p>
+      <div class="cta-row">
+        <a class="btn solid" href="login.html">立即加入 · 會員登入</a>
+        <a class="btn" href="admin.html">經營者 · 後台入口</a>
+      </div>
+    </div>
+
+    <div class="disc">
+      <b>風險與合規免責聲明:</b> 本頁為概念與願景介紹,不構成任何投資建議、要約或招攬。STO(證券型代幣)與 RWA(真實世界資產代幣化)涉及證券法規,實際發行須依各地主管機關規定完成合規程序(如募資許可、KYC/AML、合格投資人審查、託管與資訊揭露等)。數位資產價格波動劇烈,可能造成本金全部損失。任何分潤比例與機制以最終經審核之法律文件與智能合約為準。參與前請諮詢專業法律、稅務與財務顧問,並自行評估風險。
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 屬於大家的數位金融新世代 · 概念展示頁 · 利益屬於大家
+</footer>
+
+<script>
+  // donut animation
+  const segs=[...document.querySelectorAll('.seg')];
+  function animDonut(){segs.forEach(s=>{s.style.transition='stroke-dasharray 1.4s cubic-bezier(.2,.8,.2,1)';s.setAttribute('stroke-dasharray',s.dataset.final)});}
+  // count to 1,000,000
+  const bn=document.getElementById('bignum');
+  function countUp(){
+    let cur=0,target=1000000,start=null;
+    function step(t){if(!start)start=t;const p=Math.min((t-start)/2200,1);
+      cur=Math.floor((1-Math.pow(1-p,3))*target);
+      bn.innerHTML=cur.toLocaleString('en-US')+' <small>個機器人</small>';
+      if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  }
+  // robot grid 240
+  const bg=document.getElementById('botgrid');
+  for(let i=0;i<240;i++){const d=document.createElement('div');d.className='bot';
+    d.style.animationDelay=(Math.random()*3).toFixed(2)+'s';bg.appendChild(d);}
+  // trigger on scroll
+  const seen=new Set();
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting&&!seen.has(e.target.id)){seen.add(e.target.id);
+    if(e.target.id==='share')animDonut();if(e.target.id==='robots')countUp();}})},{threshold:.3});
+  io.observe(document.getElementById('share'));
+  io.observe(document.getElementById('robots'));
+</script>
+</body>
+</html>

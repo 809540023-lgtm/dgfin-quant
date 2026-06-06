@@ -1,0 +1,160 @@
+{
+  "pick_date": "2026-06-05",
+  "scanned": 60,
+  "long": [
+    {
+      "stock_id": "1119",
+      "z_score": 9.2,
+      "grade": "HEALTHY",
+      "signal": "STRONG_BUY",
+      "main_buy": 1,
+      "rank": 1
+    },
+    {
+      "stock_id": "1149",
+      "z_score": 9.9,
+      "grade": "HEALTHY",
+      "signal": "STRONG_BUY",
+      "main_buy": 1,
+      "rank": 2
+    },
+    {
+      "stock_id": "1154",
+      "z_score": 4.58,
+      "grade": "HEALTHY",
+      "signal": "STRONG_BUY",
+      "main_buy": 0.993,
+      "rank": 3
+    },
+    {
+      "stock_id": "1135",
+      "z_score": 6.8,
+      "grade": "HEALTHY",
+      "signal": "STRONG_BUY",
+      "main_buy": 0.983,
+      "rank": 4
+    },
+    {
+      "stock_id": "1108",
+      "z_score": 5.11,
+      "grade": "HEALTHY",
+      "signal": "STRONG_BUY",
+      "main_buy": 0.976,
+      "rank": 5
+    },
+    {
+      "stock_id": "1140",
+      "z_score": 12.29,
+      "grade": "HEALTHY",
+      "signal": "STRONG_BUY",
+      "main_buy": 0.92,
+      "rank": 6
+    },
+    {
+      "stock_id": "1113",
+      "z_score": 4.84,
+      "grade": "HEALTHY",
+      "signal": "STRONG_BUY",
+      "main_buy": 0.893,
+      "rank": 7
+    },
+    {
+      "stock_id": "1144",
+      "z_score": 6.05,
+      "grade": "HEALTHY",
+      "signal": "STRONG_BUY",
+      "main_buy": 0.876,
+      "rank": 8
+    },
+    {
+      "stock_id": "1104",
+      "z_score": 5.32,
+      "grade": "HEALTHY",
+      "signal": "STRONG_BUY",
+      "main_buy": 0.863,
+      "rank": 9
+    },
+    {
+      "stock_id": "1137",
+      "z_score": 5.55,
+      "grade": "HEALTHY",
+      "signal": "STRONG_BUY",
+      "main_buy": 0.823,
+      "rank": 10
+    }
+  ],
+  "short": [
+    {
+      "stock_id": "1101",
+      "z_score": 1.09,
+      "grade": "DISTRESS",
+      "signal": "STRONG_SHORT",
+      "main_buy": 0.002,
+      "rank": 1
+    },
+    {
+      "stock_id": "1112",
+      "z_score": 1.16,
+      "grade": "DISTRESS",
+      "signal": "STRONG_SHORT",
+      "main_buy": 0,
+      "rank": 2
+    },
+    {
+      "stock_id": "1103",
+      "z_score": 1.26,
+      "grade": "DISTRESS",
+      "signal": "STRONG_SHORT",
+      "main_buy": 0,
+      "rank": 3
+    },
+    {
+      "stock_id": "1118",
+      "z_score": 1.33,
+      "grade": "DISTRESS",
+      "signal": "STRONG_SHORT",
+      "main_buy": 0.16,
+      "rank": 4
+    },
+    {
+      "stock_id": "1116",
+      "z_score": 1.55,
+      "grade": "DISTRESS",
+      "signal": "STRONG_SHORT",
+      "main_buy": 0.181,
+      "rank": 5
+    },
+    {
+      "stock_id": "1147",
+      "z_score": 1.67,
+      "grade": "DISTRESS",
+      "signal": "STRONG_SHORT",
+      "main_buy": 0,
+      "rank": 6
+    },
+    {
+      "stock_id": "1102",
+      "z_score": 1.68,
+      "grade": "DISTRESS",
+      "signal": "STRONG_SHORT",
+      "main_buy": 0.245,
+      "rank": 7
+    },
+    {
+      "stock_id": "1106",
+      "z_score": 1.74,
+      "grade": "DISTRESS",
+      "signal": "STRONG_SHORT",
+      "main_buy": 0.232,
+      "rank": 8
+    },
+    {
+      "stock_id": "1152",
+      "z_score": 1.78,
+      "grade": "DISTRESS",
+      "signal": "STRONG_SHORT",
+      "main_buy": 0.136,
+      "rank": 9
+    }
+  ]
+}
