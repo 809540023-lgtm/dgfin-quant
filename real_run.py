@@ -14,9 +14,20 @@ from agent_b_quant import verify_quant_signals
 from data_source_twse import TWSEDataSource
 from decision_engine import pretty
 
+# 精選非金融權值股清單(Altman Z-Score 不適用金控/銀行/保險，故排除金融股)
+# 涵蓋半導體、電子、傳產、航運、汽車、電信等，免費方案可快速跑完。
+WATCHLIST = [
+    "2330", "2317", "2454", "2308", "2303", "2379", "2357", "2382", "2395", "3008",
+    "3231", "2353", "2474", "3045", "4904", "2412", "2002", "1301", "1303", "1326",
+    "1101", "1102", "2207", "2105", "1216", "2912", "9910", "2603", "2609", "2615",
+    "2618", "2610", "1402", "2409", "6505", "2884",
+]
 
-def run_real(limit=None):
-    ds = TWSEDataSource(limit=limit)
+
+def run_real(limit=None, watchlist="default"):
+    if watchlist == "default":
+        watchlist = WATCHLIST
+    ds = TWSEDataSource(limit=limit, watchlist=watchlist)
     rows = []
     for sid in ds.get_universe():
         fin = ds.get_financials(sid)

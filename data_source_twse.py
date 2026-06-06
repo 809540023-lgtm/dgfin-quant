@@ -63,7 +63,7 @@ def _pick(row, *keys):
 
 
 class TWSEDataSource:
-    def __init__(self, limit=None):
+    def __init__(self, limit=None, watchlist=None):
         print("[TWSE] 載入真實財報與股價…")
         self.income = self._index(_get("/opendata/t187ap06_L_ci"))   # 損益表
         self.balance = self._index(_get("/opendata/t187ap07_L_ci"))  # 資產負債表
@@ -71,6 +71,14 @@ class TWSEDataSource:
         self.daily = self._index_daily(_get("/exchangeReport/STOCK_DAY_ALL"))
 
         ids = sorted(set(self.income) & set(self.balance) & set(self.daily))
+        if watchlist:
+            wl = set(str(s) for s in watchlist)
+            ids = [s for s in ids if s in wl]
+            # 釋放記憶體：只保留清單內資料(免費方案友善)
+            self.income = {k: v for k, v in self.income.items() if k in wl}
+            self.balance = {k: v for k, v in self.balance.items() if k in wl}
+            self.daily = {k: v for k, v in self.daily.items() if k in wl}
+            self.valuation = {k: v for k, v in self.valuation.items() if k in wl}
         if limit:
             ids = ids[:limit]
         self._universe = ids
