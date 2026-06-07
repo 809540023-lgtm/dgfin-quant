@@ -84,12 +84,12 @@
     <div class="right"><span id="who">—</span><button class="logout" onclick="adminLogout()">登出</button></div>
   </div>
   <div class="container">
-    <div class="demo-note">📊 提示:除了下方連到引擎的真實數據外,本頁營運 KPI(成員數、收益、分潤金額)目前為 <b>示範數字</b>,待平台實際營運後接真實後端。</div>
+    <div class="demo-note">📊 提示:「<b>註冊會員</b>」與下方「會員清單」為 Supabase <b>真實資料</b>;收益、機器人、RWA 等 KPI 待平台實際營運後再接真實後端(目前為示範)。</div>
     <div class="kpis">
-      <div class="kpi"><div class="l">社群成員</div><div class="v grad">12,480</div></div>
-      <div class="kpi"><div class="l">本月平台收益</div><div class="v grad">NT$ 8.6M</div></div>
-      <div class="kpi"><div class="l">上線機器人</div><div class="v grad">900,500</div></div>
-      <div class="kpi"><div class="l">RWA 資產上鏈</div><div class="v grad">NT$ 240M</div></div>
+      <div class="kpi"><div class="l">註冊會員(真實)</div><div class="v grad" id="kpiMembers">—</div></div>
+      <div class="kpi"><div class="l">本月平台收益(示範)</div><div class="v grad">NT$ 8.6M</div></div>
+      <div class="kpi"><div class="l">上線機器人(示範)</div><div class="v grad">900,500</div></div>
+      <div class="kpi"><div class="l">RWA 資產上鏈(示範)</div><div class="v grad">NT$ 240M</div></div>
     </div>
 
     <div class="panel">
@@ -108,14 +108,11 @@
         <p style="font-size:14px;margin-top:8px"><a href="picks.json">→ 原始名單 JSON</a></p>
       </div>
       <div class="panel">
-        <h2>最新社群成員(示範)</h2>
+        <h2>會員清單(真實 · Supabase)</h2>
+        <p class="desc" id="memberSummary">載入中…</p>
         <table>
-          <thead><tr><th>成員</th><th>角色</th><th>狀態</th></tr></thead>
-          <tbody>
-            <tr><td>Demo 社群成員</td><td><span class="tag t70">社群 70%</span></td><td class="online">● 在線</td></tr>
-            <tr><td>架構營運組</td><td><span class="tag t20">經營 20%</span></td><td class="online">● 在線</td></tr>
-            <tr><td>合規顧問 林博士</td><td><span class="tag t10">顧問 10%</span></td><td style="color:var(--muted)">離線</td></tr>
-          </tbody>
+          <thead><tr><th>暱稱 / Email</th><th>角色</th><th>註冊日期</th></tr></thead>
+          <tbody id="memberRows"><tr><td colspan="3" style="color:var(--muted)">載入中…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -124,8 +121,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = "https://hodgljypvfofzbhvlmhj.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_2FR3r3hrSD1AXHhfM_DmiA_EGGn4d-B";   // publishable key（可公開）
+  const SUPABASE_URL = "https://mbavmmsekacjbncruzet.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_dHYU0ONmY1Zl7n36K2QTyw_nI7fpoxU";   // publishable key（可公開）
   const ALLOWED_ROLES = ["operator", "admin"];   // 只有這些角色能進後台
 
   let sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
@@ -160,6 +157,33 @@
     document.getElementById('dash').style.display='block';
     document.getElementById('who').textContent =
       '👤 ' + (user.email) + ' · ' + (roleName[role]||role);
+    loadMembers();
+  }
+
+  const roleTag = {community:'t70', operator:'t20', advisor:'t10', admin:'t20'};
+  const roleLbl = {community:'社群 70%', operator:'經營 20%', advisor:'顧問 10%', admin:'管理員'};
+
+  async function loadMembers(){
+    if(!sb) return;
+    // 真實註冊會員數
+    const {count} = await sb.from('profiles').select('*', {count:'exact', head:true});
+    if(count != null) document.getElementById('kpiMembers').textContent = count.toLocaleString('en-US');
+    // 真實會員清單(最新 20 筆)
+    const {data, error} = await sb.from('profiles')
+      .select('email,name,role,created_at').order('created_at',{ascending:false}).limit(20);
+    const tb = document.getElementById('memberRows');
+    if(error){ tb.innerHTML='<tr><td colspan="3" style="color:var(--pink)">讀取失敗:'+error.message+'</td></tr>'; return; }
+    if(!data || !data.length){ tb.innerHTML='<tr><td colspan="3" style="color:var(--muted)">尚無註冊會員</td></tr>';
+      document.getElementById('memberSummary').textContent='目前 0 位會員'; return; }
+    // 角色統計
+    const by={}; data.forEach(r=>by[r.role]=(by[r.role]||0)+1);
+    document.getElementById('memberSummary').textContent =
+      '共 '+(count!=null?count:data.length)+' 位 · 顯示最新 '+data.length+' 筆';
+    tb.innerHTML = data.map(r=>{
+      const tag = roleTag[r.role]||'t70'; const lbl = roleLbl[r.role]||r.role;
+      const who = (r.name? r.name+' · ':'') + (r.email||'');
+      return '<tr><td>'+who+'</td><td><span class="tag '+tag+'">'+lbl+'</span></td><td style="color:var(--muted)">'+(r.created_at||'').slice(0,10)+'</td></tr>';
+    }).join('');
   }
 
   if(sb) gate();   // 已登入且角色符合 → 直接進後台
