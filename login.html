@@ -96,6 +96,22 @@
       <div class="stat"><span>帳號 ID</span><b id="d_uid" style="font-size:12px"></b></div>
       <div class="stat"><span>註冊日期</span><b id="d_created" style="font-size:12px"></b></div>
     </div>
+
+    <div style="margin-top:20px;border:1px solid var(--line);border-radius:14px;padding:16px">
+      <div style="font-weight:800;margin-bottom:4px">申請變更角色</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:10px">送出後需經後台(經營者/管理員)審核才會生效。</div>
+      <div id="reqStatus" style="font-size:13px;margin-bottom:10px"></div>
+      <div id="reqForm">
+        <label style="margin-top:0">想變更為</label>
+        <select id="rq_role">
+          <option value="community">社群擁有者(70%)</option>
+          <option value="operator">經營者(20%)</option>
+          <option value="advisor">顧問(10%)</option>
+        </select>
+        <button class="btn" style="margin-top:14px" id="rq_btn" onclick="requestRole()">送出申請</button>
+      </div>
+    </div>
+
     <button class="btn logout" onclick="logout()">登出</button>
   </div>
 </div>
@@ -103,8 +119,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ====== 只需填這兩個「可公開」的值（Supabase → Project Settings → API）======
-  const SUPABASE_URL = "https://mbavmmsekacjbncruzet.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_dHYU0ONmY1Zl7n36K2QTyw_nI7fpoxU";   // publishable key（可公開）
+  const SUPABASE_URL = "https://hodgljypvfofzbhvlmhj.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_2FR3r3hrSD1AXHhfM_DmiA_EGGn4d-B";   // publishable key（可公開）
   // =======================================================================
 
   const roleMap = {
@@ -157,12 +173,22 @@
 
   async function logout(){ if(sb) await sb.auth.signOut(); location.reload(); }
 
+  let CURRENT_USER = null, CURRENT_ROLE = 'community';
+
   async function render(){
     if(!sb) return;
     const {data:{user}} = await sb.auth.getUser();
     if(!user) return;
+    CURRENT_USER = user;
     const meta = user.user_metadata || {};
-    const r = roleMap[meta.role] || roleMap.community;
+    // 角色以 profiles 為準(審核變更後即生效),讀不到時退回註冊時的 metadata
+    let role = meta.role || 'community';
+    try{
+      const {data:prof} = await sb.from('profiles').select('role,name').eq('id', user.id).single();
+      if(prof && prof.role) role = prof.role;
+    }catch(e){}
+    CURRENT_ROLE = role;
+    const r = roleMap[role] || roleMap.community;
     document.getElementById('auth').style.display='none';
     document.getElementById('dash').style.display='block';
     d_name.textContent = meta.name || user.email.split('@')[0];
@@ -172,7 +198,42 @@
     d_uid.textContent = user.id;
     d_created.textContent = (user.created_at||'').slice(0,10);
     d_badge.innerHTML = '<span class="role-badge '+r.c+'">'+r.t+' · 分潤 '+r.s+'</span>';
+    loadReqStatus();
   }
+
+  async function loadReqStatus(){
+    if(!sb || !CURRENT_USER) return;
+    const el = document.getElementById('reqStatus');
+    const {data} = await sb.from('role_requests').select('requested_role,status,created_at')
+      .eq('user_id', CURRENT_USER.id).order('created_at',{ascending:false}).limit(1);
+    if(data && data.length){
+      const q = data[0];
+      const label = (roleMap[q.requested_role]||{t:q.requested_role}).t;
+      if(q.status==='pending'){
+        el.innerHTML = '⏳ 你有一筆申請(變更為「'+label+'」)<b style="color:var(--cyan)"> 審核中</b>。';
+        document.getElementById('reqForm').style.display='none';
+        return;
+      }
+      if(q.status==='approved') el.innerHTML = '✅ 上次申請(「'+label+'」)<b style="color:var(--green)"> 已核准</b>。';
+      if(q.status==='rejected') el.innerHTML = '❌ 上次申請(「'+label+'」)<b style="color:var(--pink)"> 已婉拒</b>。';
+    } else { el.textContent=''; }
+    document.getElementById('reqForm').style.display='block';
+  }
+
+  async function requestRole(){
+    if(!sb || !CURRENT_USER) return;
+    const want = document.getElementById('rq_role').value;
+    if(want === CURRENT_ROLE){ setMsgInline('你已經是這個角色了。'); return; }
+    rq_btn.disabled = true;
+    const {error} = await sb.from('role_requests').insert({
+      user_id: CURRENT_USER.id, email: CURRENT_USER.email,
+      from_role: CURRENT_ROLE, requested_role: want, status: 'pending'
+    });
+    rq_btn.disabled = false;
+    if(error){ setMsgInline('送出失敗:'+error.message); return; }
+    loadReqStatus();
+  }
+  function setMsgInline(t){ document.getElementById('reqStatus').textContent = t; }
 
   if(sb) render();
 </script>

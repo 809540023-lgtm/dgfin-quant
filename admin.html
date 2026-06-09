@@ -93,11 +93,26 @@
     </div>
 
     <div class="panel">
-      <h2>70 / 20 / 10 分潤儀表板</h2>
-      <p class="desc">智能合約本月自動分配總額 NT$ 8.6M,依鏈上規則執行,不可竄改。(示範)</p>
-      <div class="barrow"><span class="nm">社群 70%</span><div class="bar"><i style="width:70%;background:var(--cyan)"></i></div><span class="pc">NT$6.02M</span></div>
-      <div class="barrow"><span class="nm">經營 20%</span><div class="bar"><i style="width:20%;background:var(--violet)"></i></div><span class="pc">NT$1.72M</span></div>
-      <div class="barrow"><span class="nm">顧問 10%</span><div class="bar"><i style="width:10%;background:var(--pink)"></i></div><span class="pc">NT$0.86M</span></div>
+      <h2>70 / 20 / 10 分潤試算(依真實會員人數)</h2>
+      <p class="desc">輸入當月平台收益,系統依 70/20/10 拆三層,再除以各層<b>真實會員人數</b>=每人可分得。收益目前無真金流來源,為可調整假設值;人數為 Supabase 真實資料。</p>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:14px">當月收益 NT$</span>
+        <input id="revInput" type="number" value="8600000" style="width:180px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--txt)">
+        <button class="logout" style="cursor:pointer" onclick="calcDist()">重新試算</button>
+      </div>
+      <table>
+        <thead><tr><th>層級</th><th>比例</th><th>該層金額</th><th>真實人數</th><th>每人可分</th></tr></thead>
+        <tbody id="distRows"><tr><td colspan="5" style="color:var(--muted)">載入中…</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>角色變更審核</h2>
+      <p class="desc" id="reqSummary">載入中…</p>
+      <table>
+        <thead><tr><th>申請人</th><th>現角色 → 申請</th><th>時間</th><th>操作</th></tr></thead>
+        <tbody id="reqRows"></tbody>
+      </table>
     </div>
 
     <div class="grid2">
@@ -121,8 +136,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = "https://mbavmmsekacjbncruzet.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_dHYU0ONmY1Zl7n36K2QTyw_nI7fpoxU";   // publishable key（可公開）
+  const SUPABASE_URL = "https://hodgljypvfofzbhvlmhj.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_2FR3r3hrSD1AXHhfM_DmiA_EGGn4d-B";   // publishable key（可公開）
   const ALLOWED_ROLES = ["operator", "admin"];   // 只有這些角色能進後台
 
   let sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
@@ -147,7 +162,12 @@
     if(!sb) return;
     const {data:{user}} = await sb.auth.getUser();
     if(!user) return;                                   // 未登入 → 留在登入頁
-    const role = (user.user_metadata||{}).role || 'community';
+    // 角色以 profiles 為準(審核變更後即生效)
+    let role = (user.user_metadata||{}).role || 'community';
+    try{
+      const {data:prof} = await sb.from('profiles').select('role').eq('id', user.id).single();
+      if(prof && prof.role) role = prof.role;
+    }catch(e){}
     if(!ALLOWED_ROLES.includes(role)){
       setMsg('權限不足:此帳號角色為「'+(roleName[role]||role)+'」,無法進入後台。');
       await sb.auth.signOut();
@@ -158,32 +178,88 @@
     document.getElementById('who').textContent =
       '👤 ' + (user.email) + ' · ' + (roleName[role]||role);
     loadMembers();
+    loadRequests();
   }
 
   const roleTag = {community:'t70', operator:'t20', advisor:'t10', admin:'t20'};
   const roleLbl = {community:'社群 70%', operator:'經營 20%', advisor:'顧問 10%', admin:'管理員'};
 
+  let ROLE_COUNTS = {community:0, operator:0, advisor:0, admin:0};
+
   async function loadMembers(){
     if(!sb) return;
-    // 真實註冊會員數
-    const {count} = await sb.from('profiles').select('*', {count:'exact', head:true});
-    if(count != null) document.getElementById('kpiMembers').textContent = count.toLocaleString('en-US');
-    // 真實會員清單(最新 20 筆)
+    // 全部會員角色(用於人數統計 + 分潤試算)
+    const {data:all} = await sb.from('profiles').select('role');
+    const total = all ? all.length : 0;
+    ROLE_COUNTS = {community:0, operator:0, advisor:0, admin:0};
+    (all||[]).forEach(r=>{ ROLE_COUNTS[r.role] = (ROLE_COUNTS[r.role]||0)+1; });
+    document.getElementById('kpiMembers').textContent = total.toLocaleString('en-US');
+    calcDist();
+    // 清單(最新 20 筆)
     const {data, error} = await sb.from('profiles')
       .select('email,name,role,created_at').order('created_at',{ascending:false}).limit(20);
     const tb = document.getElementById('memberRows');
     if(error){ tb.innerHTML='<tr><td colspan="3" style="color:var(--pink)">讀取失敗:'+error.message+'</td></tr>'; return; }
     if(!data || !data.length){ tb.innerHTML='<tr><td colspan="3" style="color:var(--muted)">尚無註冊會員</td></tr>';
       document.getElementById('memberSummary').textContent='目前 0 位會員'; return; }
-    // 角色統計
-    const by={}; data.forEach(r=>by[r.role]=(by[r.role]||0)+1);
-    document.getElementById('memberSummary').textContent =
-      '共 '+(count!=null?count:data.length)+' 位 · 顯示最新 '+data.length+' 筆';
+    document.getElementById('memberSummary').textContent = '共 '+total+' 位 · 顯示最新 '+data.length+' 筆';
     tb.innerHTML = data.map(r=>{
       const tag = roleTag[r.role]||'t70'; const lbl = roleLbl[r.role]||r.role;
       const who = (r.name? r.name+' · ':'') + (r.email||'');
       return '<tr><td>'+who+'</td><td><span class="tag '+tag+'">'+lbl+'</span></td><td style="color:var(--muted)">'+(r.created_at||'').slice(0,10)+'</td></tr>';
     }).join('');
+  }
+
+  // 分潤試算:收益 × 70/20/10 ÷ 各層真實人數
+  function calcDist(){
+    const rev = Math.max(0, parseFloat(document.getElementById('revInput').value)||0);
+    const tiers = [
+      {k:'社群(70%)', ratio:0.70, n:ROLE_COUNTS.community||0, c:'var(--cyan)'},
+      {k:'經營(20%)', ratio:0.20, n:(ROLE_COUNTS.operator||0)+(ROLE_COUNTS.admin||0), c:'var(--violet)'},
+      {k:'顧問(10%)', ratio:0.10, n:ROLE_COUNTS.advisor||0, c:'var(--pink)'},
+    ];
+    const fmt = x => 'NT$ '+Math.round(x).toLocaleString('en-US');
+    document.getElementById('distRows').innerHTML = tiers.map(t=>{
+      const pot = rev*t.ratio;
+      const per = t.n>0 ? pot/t.n : null;
+      return '<tr><td><b style="color:'+t.c+'">'+t.k+'</b></td><td>'+(t.ratio*100)+'%</td><td>'+fmt(pot)+
+        '</td><td>'+t.n+' 人</td><td>'+(per==null?'<span style="color:var(--muted)">無此角色會員</span>':'<b style="color:var(--green)">'+fmt(per)+'</b>')+'</td></tr>';
+    }).join('');
+  }
+
+  // 角色變更審核
+  async function loadRequests(){
+    if(!sb) return;
+    const {data, error} = await sb.from('role_requests')
+      .select('id,user_id,email,from_role,requested_role,status,created_at')
+      .eq('status','pending').order('created_at',{ascending:true});
+    const tb = document.getElementById('reqRows');
+    const sum = document.getElementById('reqSummary');
+    if(error){ sum.textContent='讀取失敗:'+error.message; tb.innerHTML=''; return; }
+    if(!data || !data.length){ sum.textContent='目前沒有待審核的角色變更申請。'; tb.innerHTML=''; return; }
+    sum.textContent = '待審核 '+data.length+' 筆。';
+    tb.innerHTML = data.map(q=>{
+      const cur = roleName[q.from_role]||q.from_role||'—';
+      const want = roleName[q.requested_role]||q.requested_role;
+      return '<tr><td>'+(q.email||q.user_id.slice(0,8))+'</td><td>'+cur+' → <b style="color:var(--cyan)">'+want+'</b></td>'+
+        '<td style="color:var(--muted)">'+(q.created_at||'').slice(0,16).replace('T',' ')+'</td>'+
+        '<td><button class="logout" style="cursor:pointer;border-color:rgba(61,255,171,.5)" onclick="approveReq(\''+q.id+'\',\''+q.user_id+'\',\''+q.requested_role+'\')">核准</button> '+
+        '<button class="logout" style="cursor:pointer;border-color:rgba(255,79,216,.5)" onclick="rejectReq(\''+q.id+'\')">拒絕</button></td></tr>';
+    }).join('');
+  }
+
+  async function approveReq(id, userId, newRole){
+    if(!sb) return;
+    // 1) 改該會員 profiles.role  2) 標記申請已核准
+    const {error:e1} = await sb.from('profiles').update({role:newRole}).eq('id', userId);
+    if(e1){ alert('更新角色失敗:'+e1.message); return; }
+    await sb.from('role_requests').update({status:'approved', decided_at:new Date().toISOString()}).eq('id', id);
+    loadRequests(); loadMembers();
+  }
+  async function rejectReq(id){
+    if(!sb) return;
+    await sb.from('role_requests').update({status:'rejected', decided_at:new Date().toISOString()}).eq('id', id);
+    loadRequests();
   }
 
   if(sb) gate();   // 已登入且角色符合 → 直接進後台
